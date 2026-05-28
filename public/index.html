@@ -5,15 +5,72 @@
   <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
+    <div class="layout">
+        <div class="sidebar">
+            <header class="sidebar-header">
+                <h1 class="title">BeatBaker</h1>
+            </header>
 
-  <h1>BeatBaker</h1>
+            <div class="controls">
+                <div class="btn-group">
+                    <button id="playBtn">Play</button>
+                    <button id="stopBtn">Stop</button>
+                    <button id="clearBtn">Clear</button>
+                </div>
 
-  <div id="board">
-    <button data-sound="kick">Kick</button>
-    <button data-sound="snare">Snare</button>
-    <button data-sound="hihat">Hi-hat</button>
-  </div>
+                <div class="slider-group">
+                    <label for="bpmSlider">BPM</label>
+                    <input type="range" id="bpmSlider" min="60" max="180" value="120" step="1">
+                    <span id="bpmValue">120</span>
+                </div>
 
-  <script src="../dist/index.js"></script>
+                <div class="slider-group">
+                    <label for="volumeSlider">Volume</label>
+                    <input type="range" id="volumeSlider" min="0" max="1" value="0.7" step="0.01">
+                </div>
+            </div>
+
+            <div class="info-bar">
+                <p>[SPACE] start/stop</p>
+                <p>Click cells to toggle beats</p>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <div class="beat-workspace">
+                <div class="piano-panel">
+                    <div class="panel-header">
+                        <h2>PIANO</h2>
+                    </div>
+
+                    <div class="grid-wrapper">
+                        <div class="piano-grid" id="pianoGrid">
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="drum-panel">
+                    <div class="panel-header">
+                        <h2>DRUMS</h2>
+                    </div>
+
+                    <div class="grid-wrapper">
+                        <div class="drum-grid" id="drumGrid">
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                            <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../dist/index.js"></script>
 </body>
 </html>
