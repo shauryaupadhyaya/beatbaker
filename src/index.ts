@@ -1,20 +1,10 @@
-function playSound(freq: number) {
-  const ctx = new AudioContext()
-  const osc = ctx.createOscillator()
-  const gain = ctx.createGain()
+const cells = document.querySelectorAll(".cell");
 
-  osc.type = "square"
-  osc.frequency.value = freq
+console.log("Found cells:", cells.length);
 
-  osc.connect(gain)
-  gain.connect(ctx.destination)
-
-  osc.start()
-  gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.3)
-}
-
-document.querySelectorAll("button").forEach((button, i) => {
-  button.addEventListener("click", () => {
-    playSound(200 + i * 100)
-  })
-})
+cells.forEach(cell => {
+  cell.addEventListener("click", () => {
+    console.log("Cell clicked, toggling active");
+    cell.classList.toggle("active");
+  });
+});
