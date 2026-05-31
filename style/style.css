@@ -11,7 +11,7 @@ body{
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 80px 24px;
+    padding: clamp(20px, 5vw, 80px) clamp(12px, 3vw, 24px);
     color: #e8e8e8;
 }
 
@@ -21,13 +21,13 @@ body{
     background: #2a2a2a;
     border: 1px solid #3a3a3a;
     border-radius: 24px;
-    padding: 36px;
+    padding: clamp(16px, 3vw, 36px);
     box-shadow: none;
 }
 
 .layout{
     display: grid;
-    grid-template-columns: 250px 1fr;
+    grid-template-columns: minmax(220px, 20vw) 1fr;
     gap: 28px;
     align-items: start;
     width: 100%;
@@ -47,10 +47,9 @@ body{
 }
 
 .title{
-    font-size: 44px;
+    font-size: clamp(2rem, 4vw, 3rem);
     font-weight: 700;
     letter-spacing: -1px;
-    margin-bottom: 8px;
     color: #f5f5f5;
 }
 
@@ -90,7 +89,7 @@ body{
 }
 
 .panel-header h2{
-    font-size: 15px;
+    font-size: clamp(0.8rem, 1vw, 1.3rem);
     letter-spacing: 1.5px;
     font-weight: 600;
     color: #d8d8d8;
@@ -106,23 +105,26 @@ body{
 
 .piano-grid{
     display: grid;
-    grid-template-columns: repeat(16, 36px);
-    grid-template-rows: repeat(6, 36px);
+    grid-template-columns: repeat(16, 1fr);
     gap: 6px;
-    width: max-content;
+    width: 100%;
 }
 
 .drum-grid{
     display: grid;
-    grid-template-columns: repeat(16, 36px);
-    grid-template-rows: repeat(2, 36px);
+    grid-template-columns: repeat(16, 1fr);
     gap: 6px;
-    width: max-content;
+    width: 100%;
+}
+
+.piano-panel, .drum-panel, .grid-wrapper{
+    width: 100%;
 }
 
 .cell{
-    width: 36px;
-    height: 36px;
+    width: 100%;
+    aspect-ratio: 1;
+    min-width: 18px;
     background: #3a3a3a;
     border: 1px solid #4b4b4b;
     border-radius: 6px;
@@ -159,13 +161,13 @@ button{
     background: #3a3a3a;
     border: 1px solid #505050;
     color: #f1f1f1;
-    padding: 14px 20px;
+    padding: clamp(14px, 1vw, 18px) clamp(18px, 1.5vw, 24px);
     cursor: pointer;
     transition: all 0.2s ease;
     letter-spacing: 0.5px;
     border-radius: 10px;
     font-weight: 800;
-    font-size: 15px;
+    font-size: clamp(0.9rem, 1vw, 1.5rem);
     box-shadow: inset 0 2px 0 #505050,
     inset 0 -3px 0 #303030,
     0 5px 5px #4a4a4a;
@@ -180,13 +182,16 @@ button:hover{
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
     color: #ececec;
     font-size: 15px;
 }
 
 input[type="range"]{
     appearance: none;
-    width: 120px;
+    flex: 1;
+    min-width: 100px;
+    max-width: 280px;
     height: 4px;
     background: #d8d8d8;
     border-radius: 20px;
@@ -210,103 +215,45 @@ input[type="range"]::-webkit-slider-thumb{
     font-size: 12px;
 }
 
-@media (max-width: 1000px) {
-    .piano-grid{
-        grid-template-rows: repeat(6, 36px);
-        grid-template-columns: repeat(16, 36px);
-    }
-
-    .drum-grid{
-        grid-template-rows: repeat(2, 36px);
-        grid-template-columns: repeat(16, 36px);
-    }
-
-    .cell{
-        width: 36px;
-        height: 36px;
-    }
-
-    .layout{
-        grid-template-columns: 1fr;
-        gap: 22px;
-    }
-
-    .main-panel{
-        width: 100%;
-        overflow: hidden;
-    }
-
-    .sidebar{
-        position: static;
-        width: 100%;
-    }
-
-    .controls{
-        width: 100%;
-    }
-
-    .piano-panel,
-    .drum-panel{
-        width: 100%;
-        overflow: hidden;
-    }
-
+@media (max-width: 900px) {
     .layout{
         grid-template-columns: 1fr;
     }
 
     .sidebar{
         position: static;
-    }
-
-    .header{
-        text-align: center;
-    }
-
-    body{
-        padding: 50px 30px;
-    }
-
-    .container{
-        width: 100%;
-        padding: 18px;
-        border-radius: 18px;
-    }
-    
-    .title{
-        font-size: 34px;
-        letter-spacing: 0.5px;
+        padding-left: 0;
     }
 
     .controls{
-        flex-direction: column;
-        align-items: stretch;
+        width: 100%;
     }
 
     .btn-group{
         width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
     }
 
     button{
-        flex: 1;
-        max-width: 250px;
+        width: 100%;
+    }
+
+    .title{
+        font-size: 32px;
     }
 
     .slider-group{
-        flex-wrap: wrap;
-        justify-content: center;
+        width: 100%;
     }
 
     input[type="range"]{
-        width: 100%;
-        max-width: 240px;
+        flex: 1;
+        width: auto;
+        max-width: none;
     }
 
     .info-bar{
         flex-direction: column;
-        gap: 8px;
         text-align: center;
+        gap: 8px;
     }
 }
