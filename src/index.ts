@@ -1,6 +1,13 @@
 const Audioctx = window.AudioContext || (window as any).webkitAudioContext;
 const ctx = new AudioContext();
 
+let isPlaying = false;
+let step = 0;
+let interval: number;
+
+let bpm = 120;
+let volume = 0.7;
+
 function playSound(freq: number, time: number, duration = 0.15){
   const oscillator = ctx.createOscillator();
   const gainNode = ctx.createGain();
@@ -8,7 +15,7 @@ function playSound(freq: number, time: number, duration = 0.15){
   oscillator.type = "square";
   oscillator.frequency.value = freq;
 
-  gainNode.gain.setValueAtTime(0.2, time);
+  gainNode.gain.setValueAtTime(volume, time);
   gainNode.gain.exponentialRampToValueAtTime(0.001, time + duration);
 
   oscillator.connect(gainNode);
@@ -28,9 +35,7 @@ function getCell(row: number, col: number){
 
 const rows = cells.length / cols;
 
-let isPlaying = false;
-let step = 0;
-let interval: number;
+
 
 function getFrequency(row: number){
   const base = 220;
@@ -51,6 +56,11 @@ function playStep(){
 
 const playBtn = document.getElementById("playBtn") as HTMLButtonElement;
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement;
+const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
+
+const bpmSlider = document.getElementById("bpmSlider") as HTMLInputElement;
+const volumeSlider = document.getElementById("volumeSlider") as HTMLInputElement;
+const bpmValue = document.getElementById("bpmValue") as HTMLSpanElement;
 
 playBtn.addEventListener("click", async () => {
   await ctx.resume();
@@ -58,14 +68,34 @@ playBtn.addEventListener("click", async () => {
   if (isPlaying) return;
 
   isPlaying = true;
-  step = 0;
-  interval = window.setInterval(playStep, 150);
+
+  const intervalTime = (60 / bpm / 4) * 1000;
+  interval = window.setInterval(playStep, intervalTime);
 });
 
 stopBtn.addEventListener("click", () => {
   isPlaying = false;
   clearInterval(interval);
-})
+});
+
+clearBtn.addEventListener("click", () => {
+  cells.forEach(cell => cell.classList.remove("active"));
+});
+
+bpmSlider.addEventListener("input", () => {
+  bpm = Number(bpmSlider.value);
+  bpmValue.textContent = bpm.toString();
+
+  if (isPlaying){
+    clearInterval(interval);
+    const intervalTime = (60 / bpm / 4) * 1000;
+    interval = window.setInterval(playStep, intervalTime);
+  }
+});
+
+volumeSlider.addEventListener("input", () => {
+  volume = Number(volumeSlider.value);
+});
 
 console.log("Found cells:", cells.length);
 
