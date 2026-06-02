@@ -27,6 +27,15 @@ function getFrequency(row) {
     const base = 220;
     return base + (rows - row) * 40;
 }
+function updatePlayhead() {
+    cells.forEach(cell => cell.classList.remove("playhead"));
+    for (let row = 0; row < rows; row++) {
+        const cell = getCell(row, step);
+        if (cell) {
+            cell.classList.add("playhead");
+        }
+    }
+}
 function playStep() {
     const time = ctx.currentTime;
     for (let row = 0; row < rows; row++) {
@@ -35,6 +44,7 @@ function playStep() {
             playSound(getFrequency(row), time);
         }
     }
+    updatePlayhead();
     step = (step + 1) % cols;
 }
 const playBtn = document.getElementById("playBtn");
@@ -69,6 +79,21 @@ bpmSlider.addEventListener("input", () => {
 });
 volumeSlider.addEventListener("input", () => {
     volume = Number(volumeSlider.value);
+});
+document.addEventListener("keydown", async (event) => {
+    if (event.code !== "Space")
+        return;
+    event.preventDefault();
+    await ctx.resume();
+    if (isPlaying) {
+        isPlaying = false;
+        clearInterval(interval);
+    }
+    else {
+        isPlaying = true;
+        const intervalTime = (60 / bpm / 4) * 1000;
+        interval = window.setInterval(playStep, intervalTime);
+    }
 });
 console.log("Found cells:", cells.length);
 cells.forEach(cell => {

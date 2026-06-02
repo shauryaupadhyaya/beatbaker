@@ -215,6 +215,17 @@ input[type="range"]::-webkit-slider-thumb{
     font-size: 12px;
 }
 
+.playhead{
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgb(190, 190, 190);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.5) inset 0 0 4px rgba(255, 255, 255, 0.3);
+}
+
+.active.playhead{
+    background: #d3d3d3;
+    transition: all 0.05s ease
+}
+
 @media (max-width: 900px) {
     .layout{
         grid-template-columns: 1fr;
