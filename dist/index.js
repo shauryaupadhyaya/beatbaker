@@ -1,4 +1,3 @@
-const Audioctx = window.AudioContext || window.webkitAudioContext;
 const ctx = new AudioContext();
 let isPlaying = false;
 let step = 0;
@@ -17,31 +16,78 @@ function playSound(freq, time, duration = 0.15) {
     oscillator.start(time);
     oscillator.stop(time + duration);
 }
-const cells = Array.from(document.querySelectorAll(".cell"));
-const cols = 16;
-function getCell(row, col) {
-    return cells[row * cols + col];
+function playKick(time) {
+    const oscillator = ctx.createOscillator();
+    const gainNode = ctx.createGain();
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(200, time);
+    oscillator.frequency.exponentialRampToValueAtTime(30, time + 0.08);
+    gainNode.gain.setValueAtTime(volume, time);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
+    oscillator.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    oscillator.start(time);
+    oscillator.stop(time + 0.12);
 }
-const rows = cells.length / cols;
+function playSnare(time) {
+    const bufferSize = ctx.sampleRate * 0.1;
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+        data[i] = Math.random() * 2 - 1;
+    }
+    const noise = ctx.createBufferSource();
+    noise.buffer = buffer;
+    const gainNode = ctx.createGain();
+    gainNode.gain.setValueAtTime(volume * 0.7, time);
+    gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+    noise.connect(gainNode);
+    gainNode.connect(ctx.destination);
+    noise.start(time);
+    noise.stop(time + 0.1);
+}
+const pianoCells = Array.from(document.querySelectorAll("#pianoGrid .cell"));
+const drumCells = Array.from(document.querySelectorAll("#drumGrid .cell"));
+const cols = 16;
+const pianoRows = 6;
+const drumRows = 2;
+function getPianoCell(row, col) {
+    return pianoCells[row * cols + col];
+}
+function getDrumCell(row, col) {
+    return drumCells[row * cols + col];
+}
 function getFrequency(row) {
     const base = 220;
-    return base + (rows - row) * 40;
+    return base + (pianoRows - row) * 40;
 }
 function updatePlayhead() {
-    cells.forEach(cell => cell.classList.remove("playhead"));
-    for (let row = 0; row < rows; row++) {
-        const cell = getCell(row, step);
-        if (cell) {
-            cell.classList.add("playhead");
-        }
+    pianoCells.forEach(cell => cell.classList.remove("playhead"));
+    drumCells.forEach(cell => cell.classList.remove("playhead"));
+    for (let row = 0; row < pianoRows; row++) {
+        getPianoCell(row, step)?.classList.add("playhead");
+    }
+    for (let row = 0; row < drumRows; row++) {
+        getDrumCell(row, step)?.classList.add("playhead");
     }
 }
 function playStep() {
     const time = ctx.currentTime;
-    for (let row = 0; row < rows; row++) {
-        const cell = getCell(row, step);
+    for (let row = 0; row < pianoRows; row++) {
+        const cell = getPianoCell(row, step);
         if (cell?.classList.contains("active")) {
             playSound(getFrequency(row), time);
+        }
+    }
+    for (let row = 0; row < drumRows; row++) {
+        const cell = getDrumCell(row, step);
+        if (!cell?.classList.contains("active"))
+            continue;
+        if (row === 0) {
+            playKick(time);
+        }
+        if (row === 1) {
+            playSnare(time);
         }
     }
     updatePlayhead();
@@ -66,7 +112,15 @@ stopBtn.addEventListener("click", () => {
     clearInterval(interval);
 });
 clearBtn.addEventListener("click", () => {
-    cells.forEach(cell => cell.classList.remove("active"));
+    pianoCells.forEach(cell => {
+        cell.classList.remove("active");
+        cell.classList.remove("playhead");
+    });
+    drumCells.forEach(cell => {
+        cell.classList.remove("active");
+        cell.classList.remove("playhead");
+    });
+    step = 0;
 });
 bpmSlider.addEventListener("input", () => {
     bpm = Number(bpmSlider.value);
@@ -95,11 +149,20 @@ document.addEventListener("keydown", async (event) => {
         interval = window.setInterval(playStep, intervalTime);
     }
 });
-console.log("Found cells:", cells.length);
-cells.forEach(cell => {
+console.log("Found cells:", pianoCells.length + drumCells.length);
+[...pianoCells, ...drumCells].forEach(cell => {
     cell.addEventListener("click", () => {
         console.log("Cell clicked, toggling active");
         cell.classList.toggle("active");
+    });
+    cell.addEventListener("mousedown", () => {
+        cell.classList.add("click");
+    });
+    cell.addEventListener("mouseup", () => {
+        cell.classList.remove("click");
+    });
+    cell.addEventListener("mouseleave", () => {
+        cell.classList.remove("click");
     });
 });
 export {};

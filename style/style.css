@@ -29,7 +29,7 @@ body{
     display: grid;
     grid-template-columns: minmax(220px, 20vw) 1fr;
     gap: 28px;
-    align-items: start;
+    align-items: center;
     width: 100%;
 }
 
@@ -40,6 +40,7 @@ body{
     position: sticky;
     top: 20px;
     padding-left: 10px;
+    align-items: center;
 }
 
 .header{
@@ -130,6 +131,11 @@ body{
     border-radius: 6px;
     cursor: pointer;
     transition: all 0.2s ease;
+}
+
+.cell.click{
+    transform: scale(0.93);
+    border-color: #939393;
 }
 
 .cell:hover{
@@ -269,3 +275,5 @@ input[type="range"]::-webkit-slider-thumb{
         gap: 8px;
     }
 }
+
+/* light mode */
