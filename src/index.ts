@@ -107,6 +107,8 @@ function playStep(){
     }
   }
 
+  console.log("step:", step, "drum row 0:", getDrumCell(0, step), "drum row 1:", getDrumCell(1, step));
+
   for (let row = 0; row < drumRows; row++){
     const cell = getDrumCell(row, step);
     if (!cell?.classList.contains("active")) continue;

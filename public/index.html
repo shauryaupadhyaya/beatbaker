@@ -5,6 +5,14 @@
   <link rel="stylesheet" href="../style/style.css">
 </head>
 <body>
+
+    <button class="theme-toggle" id="theme-toggle">
+        <svg class="theme-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" id="sunIcon" style="display: none;"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" id="moonIcon"/>
+        </svg>
+    </button>
+
     <div class="container">
         <div class="layout">
             <div class="sidebar">
@@ -14,9 +22,25 @@
 
                 <div class="controls">
                     <div class="btn-group">
-                        <button id="playBtn">Play</button>
-                        <button id="stopBtn">Stop</button>
-                        <button id="clearBtn">Clear</button>
+                        <button id="playBtn" aria-label="Play">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M8 5v14l11-7z"></path>
+                            </svg>
+                        </button>
+                        <button id="stopBtn" aria-label="Stop">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <rect x="6" y="6" width="12" height="12" rx="2"></rect>
+                            </svg>
+                        </button>
+                        <button id="clearBtn" aria-label="Clear">
+                            <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3 6h18"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M8 6V4h8v2"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6l1 14h10l1-14"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M10 10v6"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M14 10v6"></path>
+                            </svg>
+                        </button>
                     </div>
 
                     <div class="slider-group">
