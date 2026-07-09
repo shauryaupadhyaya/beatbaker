@@ -216,3 +216,58 @@ console.log("Found cells:", pianoCells.length + drumCells.length);
     cell.classList.remove("click");
   });
 });
+
+// theme toggle
+const themeToggle = document.getElementById("theme-toggle") as HTMLButtonElement | null;
+const sunIcon = document.getElementById("sunIcon") as SVGPathElement | null;
+const moonIcon = document.getElementById("moonIcon") as SVGPathElement | null;
+
+function setTheme(theme: "light" | "dark"){
+  document.body.classList.toggle("light", theme === "light");
+  localStorage.setItem("theme", theme);
+
+  if (sunIcon && moonIcon){
+    sunIcon.style.display = theme === "light" ? "block" : "none";
+    moonIcon.style.display = theme === "light" ? "none" : "block";
+  }
+}
+
+const savedTheme = (localStorage.getItem("theme") as "light" | "dark" | null) || "dark";
+setTheme(savedTheme);
+
+themeToggle?.addEventListener("click", async () => {
+  const nextTheme = document.body.classList.contains("light") ? "dark" : "light";
+
+  if(!document.startViewTransition){
+    setTheme(nextTheme);
+    return;
+  }
+
+  const rect = themeToggle.getBoundingClientRect();
+  const x = rect.left + rect.width / 2;
+  const y = rect.top + rect.height / 2;
+  const endRadius = Math.hypot(
+    Math.max(x, window.innerWidth - x),
+    Math.max(y, window.innerHeight - y)
+  );
+
+  const transition = document.startViewTransition(() => {
+    setTheme(nextTheme);
+  });
+
+  await transition.ready;
+
+  document.documentElement.animate(
+    {
+      clipPath: [
+        `circle(0px at ${x}px ${y}px)`,
+        `circle(${endRadius}px at ${x}px ${y}px)`
+      ]
+    },
+    {
+      duration: 1000,
+      easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+      pseudoElement: '::view-transition-new(root)'
+    }
+  )
+});

@@ -79,6 +79,7 @@ function playStep() {
             playSound(getFrequency(row), time);
         }
     }
+    console.log("step:", step, "drum row 0:", getDrumCell(0, step), "drum row 1:", getDrumCell(1, step));
     for (let row = 0; row < drumRows; row++) {
         const cell = getDrumCell(row, step);
         if (!cell?.classList.contains("active"))
@@ -163,6 +164,45 @@ console.log("Found cells:", pianoCells.length + drumCells.length);
     });
     cell.addEventListener("mouseleave", () => {
         cell.classList.remove("click");
+    });
+});
+// theme toggle
+const themeToggle = document.getElementById("theme-toggle");
+const sunIcon = document.getElementById("sunIcon");
+const moonIcon = document.getElementById("moonIcon");
+function setTheme(theme) {
+    document.body.classList.toggle("light", theme === "light");
+    localStorage.setItem("theme", theme);
+    if (sunIcon && moonIcon) {
+        sunIcon.style.display = theme === "light" ? "block" : "none";
+        moonIcon.style.display = theme === "light" ? "none" : "block";
+    }
+}
+const savedTheme = localStorage.getItem("theme") || "dark";
+setTheme(savedTheme);
+themeToggle?.addEventListener("click", async () => {
+    const nextTheme = document.body.classList.contains("light") ? "dark" : "light";
+    if (!document.startViewTransition) {
+        setTheme(nextTheme);
+        return;
+    }
+    const rect = themeToggle.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top + rect.height / 2;
+    const endRadius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y));
+    const transition = document.startViewTransition(() => {
+        setTheme(nextTheme);
+    });
+    await transition.ready;
+    document.documentElement.animate({
+        clipPath: [
+            `circle(0px at ${x}px ${y}px)`,
+            `circle(${endRadius}px at ${x}px ${y}px)`
+        ]
+    }, {
+        duration: 1000,
+        easing: "cubic-bezier(0.4, 0, 0.2, 1)",
+        pseudoElement: '::view-transition-new(root)'
     });
 });
 export {};

@@ -23,7 +23,7 @@
     --radius-sm: 8px;
 }
 
-.light{
+body.light{
     --bg: #f6f7f9;
     --surface: #ffffff;
     --surface-2: #f1f3f5;
@@ -54,10 +54,6 @@ html{
     color-scheme: dark;
     height: 100%;
     box-sizing: border-box;
-}
-
-body.light{
-    color-scheme: light;
 }
 
 body{
@@ -444,6 +440,12 @@ body.light .theme-toggle:active{
 
 body.light .theme-icon path{
     stroke: #1a1a1a;
+}
+
+::view-transition-old(root),
+::view-transition-new(root){
+    animation: none;
+    mix-blend-mode: normal;    
 }
 
 @media (max-width: 900px) {
