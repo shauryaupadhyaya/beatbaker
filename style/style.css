@@ -287,6 +287,28 @@ button:active{
     flex-shrink: 0;
 }
 
+.download-section{
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    box-shadow: var(--shadow-soft), var(--inset-light);
+    width: 100%;
+}
+
+.download-btn{
+    width: 100%;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.download-icon{
+    width: 20px;
+    height: 20px;
+}
+
  .slider-group{
     display: flex;
     align-items: center;

@@ -1,3 +1,4 @@
+//sound creation
 const ctx = new AudioContext();
 
 let isPlaying = false;
@@ -7,9 +8,9 @@ let interval: number;
 let bpm = 120;
 let volume = 0.7;
 
-function playSound(freq: number, time: number, duration = 0.15){
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
+function playSound(audioCtx: BaseAudioContext, destination: AudioNode, freq: number, time: number, duration = 0.15){
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
 
   oscillator.type = "square";
   oscillator.frequency.value = freq;
@@ -18,15 +19,15 @@ function playSound(freq: number, time: number, duration = 0.15){
   gainNode.gain.exponentialRampToValueAtTime(0.001, time + duration);
 
   oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
+  gainNode.connect(destination);
 
   oscillator.start(time);
   oscillator.stop(time + duration);
 }
 
-function playKick(time: number){
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
+function playKick(audioCtx: BaseAudioContext, destination: AudioNode, time: number){
+  const oscillator = audioCtx.createOscillator();
+  const gainNode = audioCtx.createGain();
 
   oscillator.type = "triangle";
   oscillator.frequency.setValueAtTime(200, time);
@@ -36,30 +37,30 @@ function playKick(time: number){
   gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.12);
 
   oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
+  gainNode.connect(destination);
 
   oscillator.start(time);
   oscillator.stop(time + 0.12);
 }
 
-function playSnare(time: number){
-  const bufferSize = ctx.sampleRate * 0.1;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+function playSnare(audioCtx: BaseAudioContext, destination: AudioNode, time: number){
+  const bufferSize = audioCtx.sampleRate * 0.1;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
   const data = buffer.getChannelData(0);
 
   for (let i=0; i<bufferSize; i++){
     data[i] = Math.random() * 2 - 1;
   }
 
-  const noise = ctx.createBufferSource();
+  const noise = audioCtx.createBufferSource();
   noise.buffer = buffer;
 
-  const gainNode = ctx.createGain();
+  const gainNode = audioCtx.createGain();
   gainNode.gain.setValueAtTime(volume * 0.7, time);
   gainNode.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
 
   noise.connect(gainNode);
-  gainNode.connect(ctx.destination);
+  gainNode.connect(destination);
 
   noise.start(time);
   noise.stop(time + 0.1); 
@@ -103,7 +104,7 @@ function playStep(){
   for (let row = 0; row < pianoRows; row++){
     const cell = getPianoCell(row, step);
     if (cell?.classList.contains("active")){
-      playSound(getFrequency(row), time);
+      playSound(ctx, ctx.destination, getFrequency(row), time);
     }
   }
 
@@ -114,11 +115,11 @@ function playStep(){
     if (!cell?.classList.contains("active")) continue;
 
     if (row === 0){
-      playKick(time);
+      playKick(ctx, ctx.destination, time);
     }
 
     if (row === 1){
-      playSnare(time);
+      playSnare(ctx, ctx.destination, time);
     }
   }
 
@@ -126,6 +127,7 @@ function playStep(){
   step = (step + 1) % cols;
 }
 
+// buttons and sliders
 const playBtn = document.getElementById("playBtn") as HTMLButtonElement;
 const stopBtn = document.getElementById("stopBtn") as HTMLButtonElement;
 const clearBtn = document.getElementById("clearBtn") as HTMLButtonElement;
@@ -271,3 +273,104 @@ themeToggle?.addEventListener("click", async () => {
     }
   )
 });
+
+//download
+const downloadBtn = document.getElementById("downloadBtn") as HTMLButtonElement;
+
+function audioBufferToWav(buffer: AudioBuffer): Blob {
+  const numChannels = buffer.numberOfChannels;
+  const sampleRate = buffer.sampleRate;
+
+  const length = buffer.length * numChannels * 2 + 44;
+
+  const wav = new ArrayBuffer(length);
+  const view = new DataView(wav);
+
+  const writeString = (offset: number, str: string) => {
+    for (let i = 0; i < str.length; i++) {
+      view.setUint8(offset + i, str.charCodeAt(i));
+    }
+  }
+
+  writeString(0, 'RIFF');
+  view.setUint32(4, length - 8, true);
+  writeString(8, 'WAVE');
+
+  writeString(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * numChannels * 2, true);
+  view.setUint16(32, numChannels * 2, true);
+  view.setUint16(34, 16, true);
+
+  writeString(36, 'data');
+  view.setUint32(40, length - 44, true);
+
+  let offset = 44;
+
+  for (let i = 0; i < buffer.length; i++) {
+    for (let channel = 0; channel < numChannels; channel++) {
+      let sample = buffer.getChannelData(channel)[i] ?? 0;
+      sample = Math.max(-1, Math.min(1, sample));
+      view .setInt16(offset, sample < 0 ? sample * 0x8000 : sample * 0x7FFF, true);
+      offset += 2;
+    }
+  }
+
+  return new Blob([view], { type: 'audio/wav' });
+}
+
+async function exportBeat(){
+  const stepDuration = 60 / bpm / 4;
+  const totalDuration = stepDuration * cols;
+
+  const offlineCtx = new OfflineAudioContext(
+    2,
+    Math.ceil(totalDuration * 44100),
+    44100
+  );
+
+  for (let col = 0; col < cols; col++){
+    const time = col * stepDuration;
+
+    for (let row = 0; row < pianoRows; row++){
+      const cell = getPianoCell(row, col);
+
+      if (cell?.classList.contains("active")){
+        playSound(offlineCtx, offlineCtx.destination, getFrequency(row), time);
+      }
+    }
+
+    for (let row = 0; row < drumRows; row++){
+      const cell = getDrumCell(row, col);
+
+      if (!cell?.classList.contains("active")){
+        continue;
+      }
+
+      if (row === 0){
+        playKick(offlineCtx, offlineCtx.destination, time);
+      }
+
+      if (row === 1){
+        playSnare(offlineCtx, offlineCtx.destination, time);
+      }
+    }
+  }
+
+  const renderedBuffer = await offlineCtx.startRendering();
+  const wavBlob = audioBufferToWav(renderedBuffer);
+  const url = URL.createObjectURL(wavBlob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "beat.wav";
+  document.body.appendChild(a);
+  a.click();
+
+  URL.revokeObjectURL(url);
+}
+
+downloadBtn.addEventListener("click", exportBeat);
